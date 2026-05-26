@@ -78,16 +78,22 @@ def book_details(request, id):
     except Book.DoesNotExist:
         return Response({"detail": "not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @api_view(["POST"])
-    def add_category_to_book(request, book_id):
-        book = get_object_or_404(Book, pk=book_id)
 
-        cat_id = request.data.get("category_id")
-        category = get_object_or_404(Category, pk=cat_id)
+@api_view(["POST"])
+def add_category_to_book(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
 
+    cat_id = request.data.get("category_id")
+    category = get_object_or_404(Category, pk=cat_id)
+    if book.categories.filter(pk=cat_id).exists():
+        book.categories.remove(category)
+        message = "category removed from book"
+    else:
         book.categories.add(category)
-        serializer = Book_serializer(book)
-        return Response(serializer.data)
+        message = "category added to book"
+    serializer = Book_serializer(book)
+
+    return Response({"message": message, "book": serializer.data})
 
 
 @api_view(["GET"])
