@@ -79,6 +79,13 @@ def book_details(request, id):
         return Response({"detail": "not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(["GET"])
+def books_by_category(request, cat_id):
+    books = Book.objects.filter(categories=cat_id)
+    serializer = Book_with_author_serializer(books, many=True)
+    return Response(serializer.data)
+
+
 @api_view(["POST"])
 def add_category_to_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)

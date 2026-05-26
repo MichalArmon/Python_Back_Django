@@ -13,7 +13,7 @@ class Category_serializer(serializers.ModelSerializer):
 class Book_serializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ["title", "id", "pages", "year", "author", "categories"]
+        fields = fields = "__all__"
 
     def validate_pages(self, value):
         if value < 10:
@@ -49,4 +49,4 @@ class Book_with_author_serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ["title", "id", "pages", "year", "author", "categories"]
+        fields = fields = "__all__"
