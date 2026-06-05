@@ -11,13 +11,19 @@ from .views import (
     books_by_author_year,
     add_category_to_book,
     books_by_category,
+    books_by_pages_year,
+    get_total_pages,
+    author_books,
 )
 
 urlpatterns = [
     path("books/", books),
+    path("books/sum-pages", get_total_pages),
+    path("books/author_books", author_books),
     path("books/<int:id>/", book_details),
     path("books/category/<int:book_id>/", add_category_to_book),
     path("books/by-category/<int:cat_id>/", books_by_category),
+    path("books/by-pages/<int:pages>/by-year/<int:year>", books_by_pages_year),
     path("books/year/<int:year>/", books_by_year),
     path("books/author/<str:author>/", books_by_author),
     path("books/author/year/<int:year>/", books_by_author_year),
