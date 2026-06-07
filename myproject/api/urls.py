@@ -14,10 +14,12 @@ from .views import (
     books_by_pages_year,
     get_total_pages,
     author_books,
+    predict_book_price,
 )
 
 urlpatterns = [
     path("books/", books),
+    path("books/predict-price/", predict_book_price),
     path("books/sum-pages", get_total_pages),
     path("books/author_books", author_books),
     path("books/<int:id>/", book_details),

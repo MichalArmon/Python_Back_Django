@@ -10,7 +10,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from django.db.models import Sum, Count
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 from rest_framework.decorators import api_view
 
@@ -174,3 +180,61 @@ def author_books(request):
         data.append({"author": author.name, "books": author.num_book})
 
     return Response(data)
+
+
+def train_book_price_model():
+    books_df = pd.read_json("api/model_data/books.json")
+
+    X = books_df[["pages", "is_best_seller"]]
+    y = books_df[["price"]]
+
+    x_scaler = MinMaxScaler()
+    y_scaler = MinMaxScaler()
+
+    X_scaled = x_scaler.fit_transform(X)
+    y_scaled = y_scaler.fit_transform(y)
+
+    model = LinearRegression()
+    model.fit(X_scaled, y_scaled)
+
+    return model, x_scaler, y_scaler
+
+
+model, x_scaler, y_scaler = train_book_price_model()
+
+
+@api_view(["GET"])
+def predict_book_price(request):
+    pages = request.GET.get("pages")
+    is_best_seller = request.GET.get("is_best_seller")
+
+    if pages is None or is_best_seller is None:
+        return Response(
+            {"error": "Please provide pages and is_best_seller"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        pages = float(pages)
+        is_best_seller = int(is_best_seller)
+    except ValueError:
+        return Response(
+            {"error": "pages must be a number and is_best_seller must be 0 or 1"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    new_book = pd.DataFrame([{"pages": pages, "is_best_seller": is_best_seller}])
+
+    new_book_scaled = x_scaler.transform(new_book)
+
+    predicted_price_scaled = model.predict(new_book_scaled)
+
+    predicted_price = y_scaler.inverse_transform(predicted_price_scaled)
+
+    return Response(
+        {
+            "pages": pages,
+            "is_best_seller": is_best_seller,
+            "predicted_price": round(float(predicted_price[0][0]), 2),
+        }
+    )
