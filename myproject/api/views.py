@@ -20,6 +20,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
 from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(["GET", "POST"])
@@ -38,6 +40,7 @@ def categories(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def books(request):
 
     year = request.query_params.get("year")

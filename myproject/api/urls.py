@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
     books,
@@ -34,4 +35,6 @@ urlpatterns = [
     path("categories/", categories),
     path("authors/<int:id>/", author_details),
     path("users/", create_user),
+    path("login/", TokenObtainPairView.as_view()),
+    path("token/refresh", TokenRefreshView.as_view()),
 ]
