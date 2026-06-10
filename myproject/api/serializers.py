@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Book, Author, Category
+from .models import Book, Author, Category, UserProfile
+from django.contrib.auth.models import User
+from django.db import transaction
 
 invalidated_words = ["test", "temp", "check", "admin", "null"]
 
@@ -50,3 +52,34 @@ class Book_with_author_serializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = "__all__"
+
+
+class UserProfile_serializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+    user_username = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            "user_id",
+            "user_username",
+            "username",
+            "password",
+            "primary_phone",
+            "secondary_phone",
+            "city",
+            "street",
+            "birth_date",
+        )
+
+    def create(self, validated_data):
+        with transaction.atomic():
+
+            user = User.objects.create_user(
+                username=validated_data.pop("username"),
+                password=validated_data.pop("password"),
+            )
+            profile = UserProfile.objects.create(user=user, **validated_data)
+        return profile

@@ -15,6 +15,7 @@ from .views import (
     get_total_pages,
     author_books,
     predict_book_price,
+    create_user,
 )
 
 urlpatterns = [
@@ -32,4 +33,5 @@ urlpatterns = [
     path("authors/", authors),
     path("categories/", categories),
     path("authors/<int:id>/", author_details),
+    path("users/", create_user),
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Author(models.Model):
@@ -30,3 +31,17 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+
+    primary_phone = models.CharField(max_length=20)
+    secondary_phone = models.CharField(max_length=20, blank=True, null=True)
+
+    city = models.CharField(max_length=20)
+    street = models.CharField(max_length=20)
+    birth_date = models.IntegerField()
+
+    def __str__(self):
+        return self.user.username
